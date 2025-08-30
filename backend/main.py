@@ -3,16 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 import logging
-from database import engine
-from models import Base
 from routers import users, posts, auth
-
-# Ensure DB tables are created on app startup (avoids import-time errors)
-def _create_tables_on_startup():
-    try:
-        Base.metadata.create_all(bind=engine)
-    except Exception:
-        logging.exception("Database not reachable during startup; skipping table creation")
 
 app = FastAPI(title="radar api", version="1.0.0")
 
@@ -36,7 +27,8 @@ app.include_router(posts.router)
 
 @app.on_event("startup")
 def on_startup() -> None:
-    _create_tables_on_startup()
+    # No DB migrations; Supabase manages schema
+    pass
 
 @app.get("/")
 def read_root():
